@@ -1,46 +1,34 @@
 "use strict";
 
-class TheGodOfComedy {
-  constructor(universe, deityName = "domDom") {
-    this.universe = universe;
-    this.deityName = deityName;
-  }
+import createElement from "./vdom/createElement.js";
+import render from "./vdom/render.js";
+import mount from "./vdom/mount.js";
 
-  // Create a hilarious being - create element
-  createBeingOfLaughter(type, superpowers, ...offsprings) {
-    return { type, superpowers, offsprings };
-  }
+const createVApp = (count) =>
+  createElement("div", {
+    attrs: {
+      id: "vdom",
+      dataCount: count, // count
+    },
+    children: [
+      "The current count is: ",
+      String(count), // count
+      createElement("img", {
+        attrs: {
+          src: "https://media.giphy.com/media/cuPm4p4pClZVC/giphy.gif",
+        },
+      }),
+    ],
+  });
 
-  // Share a comedic being with the world - render element
-  spreadLaughter(being) {
-    const entity = document.createElement(being.type);
+let count = 0;
+const vApp = createVApp(count);
+const $app = render(vApp);
+let $rootEl = mount($app, document.getElementById("app"));
 
-    for (const power in being.superpowers) {
-      entity.setAttribute(power, being.superpowers[power]);
-    }
+console.log($rootEl);
 
-    for (const offspring of being.offsprings) {
-      if (offspring.type) {
-        entity.appendChild(this.spreadLaughter(offspring));
-      } else {
-        entity.appendChild(document.createTextNode(offspring));
-      }
-    }
-
-    this.universe.appendChild(entity);
-    return entity;
-  }
-}
-
-const universe = document.getElementById("vdom");
-const godOfComedy = new TheGodOfComedy(universe);
-
-const funnyBeing = godOfComedy.createBeingOfLaughter(
-  "div",
-  { class: "hilarious" },
-  godOfComedy.createBeingOfLaughter("p", {}, "Why did the tomato turn red?"),
-  godOfComedy.createBeingOfLaughter("p", {}, "Because it saw the salad dressing!"),
-  godOfComedy.createBeingOfLaughter("img", { src: "https://media.giphy.com/media/cuPm4p4pClZVC/giphy.gif" })
-);
-
-godOfComedy.spreadLaughter(funnyBeing);
+setInterval(() => {
+  count++;
+  $rootEl = mount(render(createVApp(count)), $rootEl);
+}, 1000);
